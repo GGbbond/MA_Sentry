@@ -25,6 +25,9 @@
 #include "rm_utils/math/utils.hpp"
 
 namespace fyt::auto_aim {
+double param_ = 0;
+Eigen::Vector3d chosen_armor_ = Eigen::Vector3d(0, 0, 0);
+
 Solver::Solver(std::weak_ptr<rclcpp::Node> n) : node_(n) {
   auto node = node_.lock();
 
@@ -196,6 +199,7 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
   if (gimbal_cmd.fire_advice) {
     FYT_DEBUG("armor_solver", "You Need Fire!");
   }
+  chosen_armor_ = chosen_armor_position;
   return gimbal_cmd;
 }
 
@@ -284,6 +288,7 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   }
 
   int selected_id = static_cast<int>(temp_angle / (2 * M_PI / armors_num));
+  param_ = decision_angle;
   return selected_id;
 }
 

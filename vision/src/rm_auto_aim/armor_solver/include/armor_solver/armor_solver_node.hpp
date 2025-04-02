@@ -107,6 +107,9 @@ private:
   visualization_msgs::msg::Marker angular_v_marker_;
   visualization_msgs::msg::Marker trajectory_marker_;
   visualization_msgs::msg::Marker armors_marker_;
+  visualization_msgs::msg::Marker armors_text_marker_;
+  visualization_msgs::msg::Marker param;
+  visualization_msgs::msg::Marker chosen_armor_marker;
   visualization_msgs::msg::Marker selection_marker_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };

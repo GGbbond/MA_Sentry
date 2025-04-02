@@ -34,6 +34,9 @@
 #include "rm_utils/math/manual_compensator.hpp"
 
 namespace fyt::auto_aim {
+extern double param_;
+extern Eigen::Vector3d chosen_armor_;
+
 // Solver class used to solve the gimbal command from tracked target
 class Solver {
 public:

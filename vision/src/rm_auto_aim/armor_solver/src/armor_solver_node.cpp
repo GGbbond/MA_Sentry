@@ -231,12 +231,31 @@ void ArmorSolverNode::initMarkers() noexcept {
   armors_marker_.scale.z = 0.125;
   armors_marker_.color.a = 1.0;
   armors_marker_.color.b = 1.0;
+  armors_text_marker_.ns = "armors_id";
+  armors_text_marker_.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  armors_text_marker_.scale.z = 0.1;
+  armors_text_marker_.color.a = 1.0;
+  armors_text_marker_.color.r = 1.0;
+  armors_text_marker_.color.g = 1.0;
+  armors_text_marker_.color.b = 1.0;
+  param.ns = "param";
+  param.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  param.scale.z = 0.1;
+  param.color.a = 1.0;
+  param.color.r = 1.0;
+  param.color.g = 1.0;
+  param.color.b = 1.0;
   selection_marker_.ns = "selection";
   selection_marker_.type = visualization_msgs::msg::Marker::SPHERE;
   selection_marker_.scale.x = selection_marker_.scale.y = selection_marker_.scale.z = 0.1;
   selection_marker_.color.a = 1.0;
   selection_marker_.color.g = 1.0;
   selection_marker_.color.r = 1.0;
+  chosen_armor_marker.ns = "chosen_armor_marker";
+  chosen_armor_marker.type = visualization_msgs::msg::Marker::SPHERE;
+  chosen_armor_marker.scale.x = chosen_armor_marker.scale.y = chosen_armor_marker.scale.z = 0.1;
+  chosen_armor_marker.color.a = 1.0;
+  chosen_armor_marker.color.r = 1.0;
   trajectory_marker_.ns = "trajectory";
   trajectory_marker_.type = visualization_msgs::msg::Marker::POINTS;
   trajectory_marker_.scale.x = 0.01;
@@ -343,7 +362,10 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
   linear_v_marker_.header = target_msg.header;
   angular_v_marker_.header = target_msg.header;
   armors_marker_.header = target_msg.header;
+  armors_text_marker_.header = target_msg.header;
+  param.header = target_msg.header;
   selection_marker_.header = target_msg.header;
+  chosen_armor_marker.header = target_msg.header;
   trajectory_marker_.header = target_msg.header;
 
   visualization_msgs::msg::MarkerArray marker_array;
@@ -376,6 +398,13 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
 
     armors_marker_.action = visualization_msgs::msg::Marker::ADD;
     armors_marker_.scale.y = tracker_->tracked_armor.type == "small" ? 0.135 : 0.23;
+    armors_text_marker_.action = visualization_msgs::msg::Marker::ADD;
+    param.action = visualization_msgs::msg::Marker::ADD;
+    param.id = 0;
+    param.pose.position = position_marker_.pose.position;
+    param.pose.position.z += 0.2;
+    param.text = std::to_string(param_);
+
     // Draw armors
     bool is_current_pair = true;
     size_t a_n = target_msg.armors_num;
@@ -396,11 +425,16 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
       p_a.y = yc - r * sin(tmp_yaw);
 
       armors_marker_.id = i;
+      armors_text_marker_.id = i;
       armors_marker_.pose.position = p_a;
+      armors_text_marker_.pose.position = p_a;
+      armors_text_marker_.pose.position.z += 0.1;
+      armors_text_marker_.text = std::to_string(i);
       tf2::Quaternion q;
       q.setRPY(0, target_msg.id == "outpost" ? -0.2618 : 0.2618, tmp_yaw);
       armors_marker_.pose.orientation = tf2::toMsg(q);
       marker_array.markers.emplace_back(armors_marker_);
+      marker_array.markers.emplace_back(armors_text_marker_);
     }
 
     selection_marker_.action = visualization_msgs::msg::Marker::ADD;
@@ -408,6 +442,12 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
     selection_marker_.pose.position.y = gimbal_cmd.distance * sin(gimbal_cmd.yaw * M_PI / 180);
     selection_marker_.pose.position.x = gimbal_cmd.distance * cos(gimbal_cmd.yaw * M_PI / 180);
     selection_marker_.pose.position.z = gimbal_cmd.distance * sin(gimbal_cmd.pitch * M_PI / 180);
+
+    chosen_armor_marker.action = visualization_msgs::msg::Marker::ADD;
+    chosen_armor_marker.points.clear();
+    chosen_armor_marker.pose.position.x = chosen_armor_.x();
+    chosen_armor_marker.pose.position.y = chosen_armor_.y();
+    chosen_armor_marker.pose.position.z = chosen_armor_.z();
 
     trajectory_marker_.action = visualization_msgs::msg::Marker::ADD;
     trajectory_marker_.points.clear();
@@ -433,8 +473,11 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
     linear_v_marker_.action = visualization_msgs::msg::Marker::DELETE;
     angular_v_marker_.action = visualization_msgs::msg::Marker::DELETE;
     armors_marker_.action = visualization_msgs::msg::Marker::DELETE;
+    armors_text_marker_.action = visualization_msgs::msg::Marker::DELETE;
+    param.action = visualization_msgs::msg::Marker::DELETE;
     trajectory_marker_.action = visualization_msgs::msg::Marker::DELETE;
     selection_marker_.action = visualization_msgs::msg::Marker::DELETE;
+    chosen_armor_marker.action = visualization_msgs::msg::Marker::DELETE;
   }
 
   marker_array.markers.emplace_back(position_marker_);
@@ -442,7 +485,10 @@ void ArmorSolverNode::publishMarkers(const rm_interfaces::msg::Target &target_ms
   marker_array.markers.emplace_back(linear_v_marker_);
   marker_array.markers.emplace_back(angular_v_marker_);
   marker_array.markers.emplace_back(armors_marker_);
+  marker_array.markers.emplace_back(armors_text_marker_);
+  marker_array.markers.emplace_back(param);
   marker_array.markers.emplace_back(selection_marker_);
+  marker_array.markers.emplace_back(chosen_armor_marker);
   marker_pub_->publish(marker_array);
 }
 
