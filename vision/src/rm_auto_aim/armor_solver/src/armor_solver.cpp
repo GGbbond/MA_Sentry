@@ -271,7 +271,9 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   Eigen::Matrix2d R_center2armor = R_odom2center.transpose() * R_odom2armor;
 
   // Equal to (alpha - beta) in most cases
-  double decision_angle = -std::asin(R_center2armor(0, 1));
+  // double decision_angle = -std::asin(R_center2armor(0, 1));
+  double decision_angle = -std::atan2(R_center2armor(0, 1), R_center2armor(0, 0));
+
 
   // Angle thresh of the armor jump
   double theta = (target_v_yaw > 0 ? side_angle_ : -side_angle_) / 180.0 * M_PI;
@@ -290,6 +292,30 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   int selected_id = static_cast<int>(temp_angle / (2 * M_PI / armors_num));
   param_ = decision_angle;
   return selected_id;
+}
+
+double Solver::get_decision_angle(const Eigen::Vector3d &target_center,
+                                  const double target_yaw,)
+{
+  // Angle between the car's center and the X-axis
+  double alpha = std::atan2(target_center.y(), target_center.x());
+  // Angle between the front of observed armor and the X-axis
+  double beta = target_yaw;
+
+  // clang-format off
+  Eigen::Matrix2d R_odom2center;
+  Eigen::Matrix2d R_odom2armor;
+  R_odom2center << std::cos(alpha), std::sin(alpha), 
+                  -std::sin(alpha), std::cos(alpha);
+  R_odom2armor << std::cos(beta), std::sin(beta), 
+                 -std::sin(beta), std::cos(beta);
+  // clang-format on
+  Eigen::Matrix2d R_center2armor = R_odom2center.transpose() * R_odom2armor;
+
+  // Equal to (alpha - beta) in most cases
+  // double decision_angle = -std::asin(R_center2armor(0, 1));
+  double decision_angle = -std::atan2(R_center2armor(0, 1), R_center2armor(0, 0));
+  return decision_angle;
 }
 
 int Solver::getBestArmorIndex(double center, double velocity, double palstance,double predict_time, double switch_threshold)
