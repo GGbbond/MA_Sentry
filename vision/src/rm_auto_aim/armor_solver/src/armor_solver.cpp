@@ -28,7 +28,7 @@ namespace fyt::auto_aim {
 double param_ = 0;
 Eigen::Vector3d chosen_armor_ = Eigen::Vector3d(0, 0, 0);
 
-Solver::Solver(std::weak_ptr<rclcpp::Node> n) : node_(n) {
+Solver::Solver(std::weak_ptr<rclcpp::Node> n) : node_(n)， index(0) {
   auto node = node_.lock();
 
   shooting_range_w_ = node->declare_parameter("solver.shooting_range_width", 0.135);
@@ -290,6 +290,23 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   int selected_id = static_cast<int>(temp_angle / (2 * M_PI / armors_num));
   param_ = decision_angle;
   return selected_id;
+}
+
+int Solver::getBestArmorIndex(double center, double velocity, double palstance,double predict_time, double switch_threshold)
+{
+  double switch_advanced_time = std::min(0.2, (switch_threshold) / abs(palstance) / 180 * M_PI); //角度/角速度=时间
+  std::Vector<double> m_yaw_angle = get_Armors_yaw(predict_time + switch_advanced_time);
+  cv::Point2d predict_center = center + velocity * predict_time;
+  for (int i = 0; i < number; i++)
+  {
+      if (abs(_std_radian(M_PI + m_yaw_angle[i] - atan2(predict_center.y, predict_center.x))) + D2R(switch_threshold) <
+          abs(_std_radian(M_PI + m_yaw_angle[index] - atan2(predict_center.y, predict_center.x))))
+      {
+          index = i;
+      }
+  }
+  return index;
+
 }
 
 void Solver::calcYawAndPitch(const Eigen::Vector3d &p,

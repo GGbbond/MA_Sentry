@@ -33,6 +33,11 @@
 #include "rm_utils/math/trajectory_compensator.hpp"
 #include "rm_utils/math/manual_compensator.hpp"
 
+// 将弧度约束在[-pi, pi]范围内
+#ifndef _std_radian
+#define _std_radian(angle) ((angle) + round((0 - (angle)) / (2 * PI)) * (2 * PI))
+#endif
+
 namespace fyt::auto_aim {
 extern double param_;
 extern Eigen::Vector3d chosen_armor_;
@@ -54,6 +59,7 @@ public:
 
   std::vector<std::pair<double, double>> getTrajectory() const noexcept; 
 
+  int index;
 private:
   // Get the armor positions from the target robot
   std::vector<Eigen::Vector3d> getArmorPositions(const Eigen::Vector3d &target_center,
