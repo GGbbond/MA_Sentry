@@ -59,7 +59,22 @@ public:
 
   std::vector<std::pair<double, double>> getTrajectory() const noexcept; 
 
+  std::Vector<double> get_Armors_yaw(const Eigen::Vector3d &target_center,
+    const double target_yaw， 
+    const double target_v_yaw, 
+    const double switch_advanced_time);
+
+  int getBestArmorIndex(double velocity, 
+      double target_v_yaw, 
+      double predict_time, 
+      double switch_threshold, 
+      const Eigen::Vector3d &target_center, 
+      const double target_yaw);
+
   int index;
+  double number = 4;
+  double switch_threshold = 15;
+
 private:
   // Get the armor positions from the target robot
   std::vector<Eigen::Vector3d> getArmorPositions(const Eigen::Vector3d &target_center,
