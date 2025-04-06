@@ -27,6 +27,7 @@
 namespace fyt::auto_aim {
 double param_ = 0;
 Eigen::Vector3d chosen_armor_ = Eigen::Vector3d(0, 0, 0);
+double arm_angle[4] = {0, 0, 0, 0};
 
 Solver::Solver(std::weak_ptr<rclcpp::Node> n) : node_(n), index(0)  {
   auto node = node_.lock();
@@ -116,11 +117,13 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
                               switch_threshold, 
                               target_position, 
                               target_yaw);
+                              
+  param_ = idx;
   auto chosen_armor_position = armor_positions.at(idx);
+  
   if (chosen_armor_position.norm() < 0.1) {
     throw std::runtime_error("No valid armor to shoot");
   }
-
   // Calculate yaw, pitch, distance
   double yaw, pitch;
   calcYawAndPitch(chosen_armor_position, rpy_, yaw, pitch);
@@ -295,9 +298,17 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   }
 
   int selected_id = static_cast<int>(temp_angle / (2 * M_PI / armors_num));
-  param_ = decision_angle;
+  // param_ = decision_angle;
   return selected_id;
 }
+
+// 将弧度约束在[-pi, pi]范围内
+double Solver::constrain_angle(double angle_)
+{
+  double result_angle = (angle_) + round((0 - (angle_)) / (2 * M_PI)) * (2 * M_PI);
+  return result_angle;
+}
+
 
 //得到"装甲板"与"车中心与云台中心"的夹角,注意！！！是预测时间后的
 //switch_advanced_time用于在计算选板id时增加的一小段阈值时间，只有在计算选板时才需要给值，正常获取装甲板yaw时该参数赋零
@@ -323,12 +334,14 @@ std::vector<double> Solver::get_Armors_yaw(const Eigen::Vector3d &target_center,
 
   // Equal to (alpha - beta) in most cases
   double decision_angle = -std::atan2(R_center2armor(0, 1), R_center2armor(0, 0));
-  std::vector<double> angle;
+  std::vector<double> angle_(number);
   for(int i = 0; i < number; i++)
   {
-    angle[i] = _std_radian(decision_angle + target_v_yaw * switch_advanced_time + i * (2 * M_PI / number));      
+    // angle[i] = constrain_angle(decision_angle + target_v_yaw * switch_advanced_time + i * (2 * M_PI / number));
+    angle_[i] = constrain_angle(decision_angle - target_v_yaw * switch_advanced_time - i * (2 * M_PI / number));
+    arm_angle[i] = angle_[i] / M_PI * 180;
   }
-  return angle;
+  return angle_;
 }
 
 int Solver::getBestArmorIndex(double target_v_yaw, 
@@ -338,7 +351,7 @@ int Solver::getBestArmorIndex(double target_v_yaw,
 {
   double switch_advanced_time = std::min(0.2, (switch_threshold) / abs(target_v_yaw) / 180 * M_PI); //角度/角速度=时间
   std::vector<double> m_yaw_angle = get_Armors_yaw(target_center, target_yaw, target_v_yaw, switch_advanced_time);
-  for (int i = 0; i < number; i++)
+   for (int i = 0; i < number; i++)
   {
       if (abs(m_yaw_angle[i]) + switch_threshold / 180 * M_PI <
           abs(m_yaw_angle[index]))

@@ -33,14 +33,11 @@
 #include "rm_utils/math/trajectory_compensator.hpp"
 #include "rm_utils/math/manual_compensator.hpp"
 
-// 将弧度约束在[-pi, pi]范围内
-#ifndef _std_radian
-#define _std_radian(angle) ((angle) + round((0 - (angle)) / (2 * M_PI)) * (2 * M_PI))
-#endif
 
 namespace fyt::auto_aim {
 extern double param_;
 extern Eigen::Vector3d chosen_armor_;
+extern double arm_angle[4];
 
 // Solver class used to solve the gimbal command from tracked target
 class Solver {
@@ -87,6 +84,8 @@ private:
                         const Eigen::Vector3d &target_center, 
                         const double target_yaw);
 
+  double constrain_angle(double angle);
+
   void calcYawAndPitch(const Eigen::Vector3d &p,
                        const std::array<double, 3> rpy,
                        double &yaw,
@@ -119,7 +118,7 @@ private:
   std::weak_ptr<rclcpp::Node> node_;
 
   int index;
-  double number = 4;
+  int number = 4;
   double switch_threshold = 15;
 };
 }  // namespace fyt::auto_aim

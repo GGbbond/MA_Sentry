@@ -111,6 +111,7 @@ private:
   visualization_msgs::msg::Marker param;
   visualization_msgs::msg::Marker chosen_armor_marker;
   visualization_msgs::msg::Marker selection_marker_;
+  visualization_msgs::msg::Marker armor_angle_marker_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };
 
