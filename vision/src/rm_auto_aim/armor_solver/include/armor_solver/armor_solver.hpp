@@ -35,7 +35,7 @@
 
 // 将弧度约束在[-pi, pi]范围内
 #ifndef _std_radian
-#define _std_radian(angle) ((angle) + round((0 - (angle)) / (2 * PI)) * (2 * PI))
+#define _std_radian(angle) ((angle) + round((0 - (angle)) / (2 * M_PI)) * (2 * M_PI))
 #endif
 
 namespace fyt::auto_aim {
@@ -59,22 +59,6 @@ public:
 
   std::vector<std::pair<double, double>> getTrajectory() const noexcept; 
 
-  std::Vector<double> get_Armors_yaw(const Eigen::Vector3d &target_center,
-    const double target_yaw， 
-    const double target_v_yaw, 
-    const double switch_advanced_time);
-
-  int getBestArmorIndex(double velocity, 
-      double target_v_yaw, 
-      double predict_time, 
-      double switch_threshold, 
-      const Eigen::Vector3d &target_center, 
-      const double target_yaw);
-
-  int index;
-  double number = 4;
-  double switch_threshold = 15;
-
 private:
   // Get the armor positions from the target robot
   std::vector<Eigen::Vector3d> getArmorPositions(const Eigen::Vector3d &target_center,
@@ -92,6 +76,16 @@ private:
                       const double target_yaw,
                       const double target_v_yaw,
                       const size_t armors_num) const noexcept;
+
+  std::vector<double> get_Armors_yaw(const Eigen::Vector3d &target_center,
+                                    const double target_yaw, 
+                                    const double target_v_yaw, 
+                                    const double switch_advanced_time);
+
+  int getBestArmorIndex(double target_v_yaw, 
+                        double switch_threshold, 
+                        const Eigen::Vector3d &target_center, 
+                        const double target_yaw);
 
   void calcYawAndPitch(const Eigen::Vector3d &p,
                        const std::array<double, 3> rpy,
@@ -123,6 +117,10 @@ private:
   double min_switching_v_yaw_;
 
   std::weak_ptr<rclcpp::Node> node_;
+
+  int index;
+  double number = 4;
+  double switch_threshold = 15;
 };
 }  // namespace fyt::auto_aim
 #endif  // ARMOR_SOLVER_SOLVER_HPP_
