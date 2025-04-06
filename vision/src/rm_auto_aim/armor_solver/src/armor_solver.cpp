@@ -299,40 +299,12 @@ int Solver::selectBestArmor(const std::vector<Eigen::Vector3d> &armor_positions,
   return selected_id;
 }
 
-<<<<<<< HEAD
-double Solver::get_decision_angle(const Eigen::Vector3d &target_center,
-                                  const double target_yaw,)
-{
-  // Angle between the car's center and the X-axis
-  double alpha = std::atan2(target_center.y(), target_center.x());
-  // Angle between the front of observed armor and the X-axis
-  double beta = target_yaw;
-
-  // clang-format off
-  Eigen::Matrix2d R_odom2center;
-  Eigen::Matrix2d R_odom2armor;
-  R_odom2center << std::cos(alpha), std::sin(alpha), 
-                  -std::sin(alpha), std::cos(alpha);
-  R_odom2armor << std::cos(beta), std::sin(beta), 
-                 -std::sin(beta), std::cos(beta);
-  // clang-format on
-  Eigen::Matrix2d R_center2armor = R_odom2center.transpose() * R_odom2armor;
-
-  // Equal to (alpha - beta) in most cases
-  // double decision_angle = -std::asin(R_center2armor(0, 1));
-  double decision_angle = -std::atan2(R_center2armor(0, 1), R_center2armor(0, 0));
-  return decision_angle;
-}
-
-int Solver::getBestArmorIndex(double center, double velocity, double palstance,double predict_time, double switch_threshold)
-=======
 //得到"装甲板"与"车中心与云台中心"的夹角,注意！！！是预测时间后的
 //switch_advanced_time用于在计算选板id时增加的一小段阈值时间，只有在计算选板时才需要给值，正常获取装甲板yaw时该参数赋零
 std::Vector<double> Solver::get_Armors_yaw(const Eigen::Vector3d &target_center,
                                            const double target_yaw， 
                                            const double target_v_yaw, 
                                            const double switch_advanced_time)
->>>>>>> 2899732 (更换选板逻辑，待测试)
 {
   // Angle between the car's center and the X-axis
   double alpha = std::atan2(target_center.y(), target_center.x());
