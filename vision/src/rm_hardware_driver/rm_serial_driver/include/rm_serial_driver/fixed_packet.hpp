@@ -33,7 +33,7 @@ class FixedPacket {
   using SharedPtr = std::shared_ptr<FixedPacket>;
   FixedPacket() {
     memset(buffer_, 0, capacity);
-    buffer_[0] = 0xff;             // 帧头
+    buffer_[0] = 0xA5;             // 帧头
     buffer_[capacity - 1] = 0x0d;  // 帧尾
   }
 

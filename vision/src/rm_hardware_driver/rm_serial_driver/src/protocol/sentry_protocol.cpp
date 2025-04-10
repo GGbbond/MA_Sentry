@@ -54,7 +54,7 @@ void ProtocolSentry::send(const geometry_msgs::msg::Twist &msg) {
   float x = msg.linear.x;
   float y = msg.linear.y;
   float z = msg.angular.z;
-  uint8_t spin = 1;
+  uint8_t spin = 0;
   //uint16_t check_sum = (uint32_t)head + *(uint32_t*)&x + *(uint32_t*)&y + *(uint32_t*)&z + (uint32_t)is_navigating;
   //uint16_t check_sum = 0;
 
@@ -63,7 +63,7 @@ void ProtocolSentry::send(const geometry_msgs::msg::Twist &msg) {
   //packet_.loadData<unsigned char>(data.is_spining ? 0x01 : 0x00, 2);
   //packet_.loadData<unsigned char>(data.is_navigating ? 0x01 : 0x00, 3);
  
-  packet_.loadData<unsigned char>(spin, 1);
+  packet_.loadData<unsigned char>(spin, 0);
   // gimbal control
   // packet_.loadData<float>(0, 4);
   // packet_.loadData<float>(0, 8);
@@ -89,6 +89,7 @@ void ProtocolSentry::send(const geometry_msgs::msg::Twist &msg) {
 void ProtocolSentry::send() {
   const auto& vision_data = this->vision_data_;
   const auto& nav_data = this->nav_data_;
+  // FYT_INFO("serial_driver","send distance {}", vision_data.distance);
 
   packet_.loadData<unsigned char>(vision_data.fire_advice ? FireState::Fire : FireState::NotFire, 1);
   packet_.loadData<float>(static_cast<float>(vision_data.pitch), 2);
@@ -98,7 +99,7 @@ void ProtocolSentry::send() {
   float x = nav_data.linear.x;
   float y = nav_data.linear.y;
   float z = nav_data.angular.z;
-  uint8_t spin = 1;
+  uint8_t spin = 0;
  
   packet_.loadData<unsigned char>(spin, 14);
   // linear x

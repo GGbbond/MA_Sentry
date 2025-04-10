@@ -52,16 +52,17 @@ public:
   bool isOpen() { return transporter_->isOpen(); }
   void enbaleRealtimeSend(bool enable);
   void enbaleDataPrint(bool enable) { use_data_print_ = enable; }
-  bool sendPacket(const FixedPacket<capacity> &packet);
-  bool sendPacket(const FixedPacket<capacity/2> &packet);
+  template<int packet_len>
+  bool sendPacket(const FixedPacket<packet_len> &packet);
   bool recvPacket(FixedPacket<capacity> &packet);
 
   std::string getErrorMessage() { return transporter_->errorMessage(); }
 
 private:
   bool checkPacket(uint8_t *tmp_buffer, int recv_len);
-  bool simpleSendPacket(const FixedPacket<capacity> &packet);
-  bool simpleSendPacket(const FixedPacket<capacity/2> &packet);
+
+  template<int packet_len>
+  bool simpleSendPacket(const FixedPacket<packet_len> &packet);
 
 private:
   std::shared_ptr<TransporterInterface> transporter_;
@@ -91,33 +92,9 @@ bool FixedPacketTool<capacity>::checkPacket(uint8_t *buffer, int recv_len) {
   return true;
 }
 
-template <int capacity>
-bool FixedPacketTool<capacity>::simpleSendPacket(const FixedPacket<capacity> &packet) {
-
-  // std::ostringstream oss;
-  // const unsigned char *data = packet.buffer();
-  // for(int i = 0 ; i<capacity;++i)
-  // {
-  //   oss<<std::hex<<std::uppercase <<std::setfill('0')<<static_cast<int>(data[i])<<" ";
-  // }
-  // FYT_INFO("serial_driver","Sending packet data: %s", oss.str().c_str());
-  // printf("serial_driver : Sending packet data: %s", oss.str().c_str());
-
-  if (transporter_->write(packet.buffer(), capacity) == capacity) {
-    // FYT_ERROR("serial_driver", "transporter_->write() ");
-    return true;
-  } else {
-    // reconnect
-    FYT_ERROR("serial_driver", "transporter_->write() failed");
-  
-    transporter_->close();
-    transporter_->open();
-    return false;
-  }
-}
-
 template<int capacity>
-bool FixedPacketTool<capacity>::simpleSendPacket(const FixedPacket<capacity/2> &packet) {
+template<int packet_len>
+bool FixedPacketTool<capacity>::simpleSendPacket(const FixedPacket<packet_len> &packet) {
 
   // std::ostringstream oss;
   // const unsigned char *data = packet.buffer();
@@ -128,7 +105,7 @@ bool FixedPacketTool<capacity>::simpleSendPacket(const FixedPacket<capacity/2> &
   // FYT_INFO("serial_driver","Sending packet data: %s", oss.str().c_str());
   // printf("serial_driver : Sending packet data: %s", oss.str().c_str());
 
-  if (transporter_->write(packet.buffer(), 16) == 16) {
+  if (transporter_->write(packet.buffer(), packet_len) == packet_len) {
     // FYT_ERROR("serial_driver", "transporter_->write() ");
     return true;
   } else {
@@ -175,19 +152,10 @@ void FixedPacketTool<capacity>::enbaleRealtimeSend(bool enable) {
 }
 
 template <int capacity>
-bool FixedPacketTool<capacity>::sendPacket(const FixedPacket<capacity> &packet) {
-  if (use_realtime_send_) {
-    std::lock_guard<std::mutex> lock(realtime_send_mut_);
-    realtime_packets_.push(packet);
-    return true;
-  } else {
-    return simpleSendPacket(packet);
-  }
-}
-
-template <int capacity>
-bool FixedPacketTool<capacity>::sendPacket(const FixedPacket<capacity/2> &packet) {
+template <int packet_len>
+bool FixedPacketTool<capacity>::sendPacket(const FixedPacket<packet_len> &packet) {
   return simpleSendPacket(packet);
+  
 }
 
 template <int capacity>
