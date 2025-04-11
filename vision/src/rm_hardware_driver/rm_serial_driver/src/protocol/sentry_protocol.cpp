@@ -126,6 +126,9 @@ bool ProtocolSentry::receive(rm_interfaces::msg::SerialReceiveData &data) {
     packet.unloadData(data.judge_system_data.game_status, 14);
     packet.unloadData(data.judge_system_data.ammo, 15);
     packet.unloadData(data.judge_system_data.hp, 17);
+    packet.unloadData(data.bullet_speed, 19);
+
+    
     // packet.unloadData(data.pitch, 2);
     // packet.unloadData(data.yaw, 6);
     // // 实际上是底盘角度

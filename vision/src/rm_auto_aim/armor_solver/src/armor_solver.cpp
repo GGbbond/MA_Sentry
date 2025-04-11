@@ -71,6 +71,8 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
     controller_delay_ = node->get_parameter("solver.controller_delay").as_double();
     side_angle_ = node->get_parameter("solver.side_angle").as_double();
     min_switching_v_yaw_ = node->get_parameter("solver.min_switching_v_yaw").as_double();
+    node->set_parameter(rclcpp::Parameter("solver.bullet_speed", bullet_speed_));
+    trajectory_compensator_->velocity = node->get_parameter("solver.bullet_speed").as_double();
     node.reset();
   } catch (const std::runtime_error &e) {
     FYT_ERROR("armor_solver", "{}", e.what());

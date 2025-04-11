@@ -40,12 +40,16 @@
 #include "rm_interfaces/msg/armors.hpp"
 #include "rm_interfaces/msg/measurement.hpp"
 #include "rm_interfaces/msg/target.hpp"
+#include "rm_interfaces/msg/serial_receive_data.hpp"
 #include "rm_interfaces/srv/set_mode.hpp"
 #include "rm_utils/heartbeat.hpp"
 #include "rm_utils/logger/log.hpp"
 
 namespace fyt::auto_aim {
 using tf2_filter = tf2_ros::MessageFilter<rm_interfaces::msg::Armors>;
+extern double bullet_speed_;
+
+
 class ArmorSolverNode : public rclcpp::Node {
 public:
   explicit ArmorSolverNode(const rclcpp::NodeOptions &options);
@@ -113,6 +117,16 @@ private:
   visualization_msgs::msg::Marker selection_marker_;
   visualization_msgs::msg::Marker armor_angle_marker_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+
+  //serial_data subscription
+  rclcpp::Subscription<rm_interfaces::msg::SerialReceiveData>::SharedPtr serial_sub;
+
+  //bullet velocity
+  void get_bullet_velocity(const rm_interfaces::msg::SerialReceiveData &serial_data_)
+  {
+    bullet_speed_ = serial_data_.bullet_speed;
+  }
+
 };
 
 }  // namespace fyt::auto_aim
