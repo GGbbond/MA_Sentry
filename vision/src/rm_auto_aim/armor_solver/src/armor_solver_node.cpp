@@ -29,7 +29,7 @@
 //Original code
 
 namespace fyt::auto_aim {
-double bullet_speed_ = 20.0;
+// double bullet_speed_ = 20.0;
 ArmorSolverNode::ArmorSolverNode(const rclcpp::NodeOptions &options)
 : Node("armor_solver", options), solver_(nullptr) {
   // Register logger

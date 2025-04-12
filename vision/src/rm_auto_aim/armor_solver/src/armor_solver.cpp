@@ -25,6 +25,7 @@
 #include "rm_utils/math/utils.hpp"
 
 namespace fyt::auto_aim {
+double bullet_speed_ = 20.0;
 double param_ = 0;
 Eigen::Vector3d chosen_armor_ = Eigen::Vector3d(0, 0, 0);
 double arm_angle[4] = {0, 0, 0, 0};
@@ -71,6 +72,10 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
     controller_delay_ = node->get_parameter("solver.controller_delay").as_double();
     side_angle_ = node->get_parameter("solver.side_angle").as_double();
     min_switching_v_yaw_ = node->get_parameter("solver.min_switching_v_yaw").as_double();
+    if(bullet_speed_ == 0)
+    {
+      bullet_speed_ = 20;
+    }
     node->set_parameter(rclcpp::Parameter("solver.bullet_speed", bullet_speed_));
     trajectory_compensator_->velocity = node->get_parameter("solver.bullet_speed").as_double();
     node.reset();
