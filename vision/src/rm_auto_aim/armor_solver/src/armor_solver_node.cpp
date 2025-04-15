@@ -29,7 +29,6 @@
 //Original code
 
 namespace fyt::auto_aim {
-// double bullet_speed_ = 20.0;
 ArmorSolverNode::ArmorSolverNode(const rclcpp::NodeOptions &options)
 : Node("armor_solver", options), solver_(nullptr) {
   // Register logger
@@ -64,6 +63,35 @@ ArmorSolverNode::ArmorSolverNode(const rclcpp::NodeOptions &options)
   s2qr_ = declare_parameter("ekf.sigma2_q_r", 800.0);
   s2qd_zc_ = declare_parameter("ekf.sigma2_q_d_zc", 800.0);
 
+  s2qx_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_x", 20.0);
+  s2qy_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_y", 20.0);
+  s2qz_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_z", 20.0);
+  s2qyaw_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_yaw", 100.0);
+  s2qr_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_r", 800.0);
+  s2qd_zc_near_HighSpeed_ = declare_parameter("ekf_near_HighSpeed.sigma2_q_d_zc", 800.0);
+
+  s2qx_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_x", 20.0);
+  s2qy_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_y", 20.0);
+  s2qz_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_z", 20.0);
+  s2qyaw_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_yaw", 100.0);
+  s2qr_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_r", 800.0);
+  s2qd_zc_near_LowSpeed_ = declare_parameter("ekf_near_LowSpeed.sigma2_q_d_zc", 800.0);
+
+  s2qx_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_x", 20.0);
+  s2qy_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_y", 20.0);
+  s2qz_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_z", 20.0);
+  s2qyaw_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_yaw", 100.0);
+  s2qr_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_r", 800.0);
+  s2qd_zc_far_HighSpeed_ = declare_parameter("ekf_far_HighSpeed.sigma2_q_d_zc", 800.0);
+
+  s2qx_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_x", 20.0);
+  s2qy_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_y", 20.0);
+  s2qz_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_z", 20.0);
+  s2qyaw_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_yaw", 100.0);
+  s2qr_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_r", 800.0);
+  s2qd_zc_far_LowSpeed_ = declare_parameter("ekf_far_LowSpeed.sigma2_q_d_zc", 800.0);
+
+  
   auto u_q = [this]() {
     Eigen::Matrix<double, X_N, X_N> q;
     double t = dt_, x = s2qx_, y = s2qy_, z = s2qz_, yaw = s2qyaw_, r = s2qr_, d_zc=s2qd_zc_;
@@ -366,6 +394,41 @@ void ArmorSolverNode::armorsCallback(const rm_interfaces::msg::Armors::SharedPtr
   // Store and Publish the target_msg
   armor_target_ = target_msg;
   target_pub_->publish(target_msg);
+
+  //根据距离和速度为卡尔曼滤波选择不同的协方差矩阵
+  if (target_msg.tracking) {
+    double distance = sqrt(pow(target_msg.position.x, 2) + pow(target_msg.position.y, 2));
+    double speed = sqrt(pow(target_msg.velocity.x, 2) + pow(target_msg.velocity.y, 2));
+    if (distance < 5 && speed < 0.5) {
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
+    } else if (distance < 5 && speed > 0.5) {
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_LowSpeed_));
+    } else if (distance > 5 && speed < 0.5) {
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_far_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_far_HighSpeed_));
+    } else {
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_LowSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
+      node->set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
+    }
+  }
 
   last_time_ = time;
 }
