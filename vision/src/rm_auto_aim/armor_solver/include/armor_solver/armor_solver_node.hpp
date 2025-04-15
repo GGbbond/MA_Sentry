@@ -77,7 +77,17 @@ private:
 
   // Armor tracker
   double s2qx_, s2qy_, s2qz_, s2qyaw_, s2qr_, s2qd_zc_;
+  double s2qx_near_HighSpeed_, s2qy_near_HighSpeed_, s2qz_near_HighSpeed_, s2qyaw_near_HighSpeed_, s2qr_near_HighSpeed_, s2qd_zc_near_HighSpeed_;
+  double s2qx_near_LowSpeed_, s2qy_near_LowSpeed_, s2qz_near_LowSpeed_, s2qyaw_near_LowSpeed_, s2qr_near_LowSpeed_, s2qd_zc_near_LowSpeed_;
+  double s2qx_far_HighSpeed_, s2qy_far_HighSpeed_, s2qz_far_HighSpeed_, s2qyaw_far_HighSpeed_, s2qr_far_HighSpeed_, s2qd_zc_far_HighSpeed_;
+  double s2qx_far_LowSpeed_, s2qy_far_LowSpeed_, s2qz_far_LowSpeed_, s2qyaw_far_LowSpeed_, s2qr_far_LowSpeed_, s2qd_zc_far_LowSpeed_;
+  
   double r_x_, r_y_, r_z_, r_yaw_;
+  double r_x_near_HighSpeed_, r_y_near_HighSpeed_, r_z_near_HighSpeed_, r_yaw_near_HighSpeed_;
+  double r_x_near_LowSpeed_, r_y_near_LowSpeed_, r_z_near_LowSpeed_, r_yaw_near_LowSpeed_;
+  double r_x_far_HighSpeed_, r_y_far_HighSpeed_, r_z_far_HighSpeed_, r_yaw_far_HighSpeed_;
+  double r_x_far_LowSpeed_, r_y_far_LowSpeed_, r_z_far_LowSpeed_, r_yaw_far_LowSpeed_;
+
   double lost_time_thres_;
   std::unique_ptr<Tracker> tracker_;
 

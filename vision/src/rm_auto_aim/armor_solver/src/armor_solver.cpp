@@ -123,7 +123,7 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
   int idx = getBestArmorIndex(target.v_yaw, 
                               switch_threshold, 
                               target_position, 
-                              target_yaw
+                              target_yaw,
                               target.armors_num);
                               
   param_ = idx;
@@ -323,7 +323,7 @@ double Solver::constrain_angle(double angle_)
 std::vector<double> Solver::get_Armors_yaw(const Eigen::Vector3d &target_center,
                                            const double target_yaw, 
                                            const double target_v_yaw, 
-                                           const double switch_advanced_time
+                                           const double switch_advanced_time,
                                            const size_t armors_num)
 {
   // Angle between the car's center and the X-axis
@@ -344,7 +344,7 @@ std::vector<double> Solver::get_Armors_yaw(const Eigen::Vector3d &target_center,
   // Equal to (alpha - beta) in most cases
   double decision_angle = -std::atan2(R_center2armor(0, 1), R_center2armor(0, 0));
   std::vector<double> angle_(armors_num);
-  for(int i = 0; i < armors_num; i++)
+  for(int i = 0; static_cast<size_t>(i) < armors_num; i++)
   {
     // angle[i] = constrain_angle(decision_angle + target_v_yaw * switch_advanced_time + i * (2 * M_PI / armors_num));
     angle_[i] = constrain_angle(decision_angle - target_v_yaw * switch_advanced_time - i * (2 * M_PI / armors_num));
@@ -356,12 +356,12 @@ std::vector<double> Solver::get_Armors_yaw(const Eigen::Vector3d &target_center,
 int Solver::getBestArmorIndex(double target_v_yaw, 
                               double switch_threshold, 
                               const Eigen::Vector3d &target_center, 
-                              const double target_yaw
+                              const double target_yaw,
                               const size_t armors_num)
 {
   double switch_advanced_time = std::min(0.2, (switch_threshold) / abs(target_v_yaw) / 180 * M_PI); //角度/角速度=时间
   std::vector<double> m_yaw_angle = get_Armors_yaw(target_center, target_yaw, target_v_yaw, switch_advanced_time, armors_num);
-   for (int i = 0; i < armors_num; i++)
+   for (int i = 0; static_cast<size_t>(i) < armors_num; i++)
   {
       if (abs(m_yaw_angle[i]) + switch_threshold / 180 * M_PI <
           abs(m_yaw_angle[index]))
