@@ -140,7 +140,7 @@ void NumberClassifier::eraseIgnoreClasses(std::vector<Armor> &armors) noexcept {
                        mismatch_armor_type = armor.number == "outpost" || armor.number == "2" ||
                                              armor.number == "sentry";
                      } else if (armor.type == ArmorType::SMALL) {
-                       mismatch_armor_type = armor.number == "1" || armor.number == "base" || armor.number == "outpost";
+                       mismatch_armor_type = armor.number == "1" || armor.number == "base";
                      }
                      return mismatch_armor_type;
                    }),
