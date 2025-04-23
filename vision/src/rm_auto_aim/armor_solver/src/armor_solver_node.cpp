@@ -416,60 +416,60 @@ void ArmorSolverNode::armorsCallback(const rm_interfaces::msg::Armors::SharedPtr
   armor_target_ = target_msg;
   target_pub_->publish(target_msg);
 
-  // //根据距离和速度为卡尔曼滤波选择不同的协方差矩阵
-  // if (target_msg.tracking) {
-  //   double distance = sqrt(pow(target_msg.position.x, 2) + pow(target_msg.position.y, 2));
-  //   double speed = sqrt(pow(target_msg.velocity.x, 2) + pow(target_msg.velocity.y, 2));
-  //   if (distance < 2 && speed < 0.5) {
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
+  //根据距离和速度为卡尔曼滤波选择不同的协方差矩阵
+  if (target_msg.tracking) {
+    double distance = sqrt(pow(target_msg.position.x, 2) + pow(target_msg.position.y, 2));
+    double speed = sqrt(pow(target_msg.velocity.x, 2) + pow(target_msg.velocity.y, 2));
+    if (distance < 2 && speed < 0.5) {
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
 
-  //     set_parameter(rclcpp::Parameter("ekf.r_x", r_x_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_y", r_y_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_z", r_z_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_near_HighSpeed_));
-  //   } else if (distance < 2 && speed > 0.5) {
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_x", r_x_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_y", r_y_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_z", r_z_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_near_HighSpeed_));
+    } else if (distance < 2 && speed > 0.5) {
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_LowSpeed_));
 
-  //     set_parameter(rclcpp::Parameter("ekf.r_x", r_x_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_y", r_y_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_z", r_z_near_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_near_LowSpeed_));
-  //   } else if (distance > 2 && speed < 0.5) {
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_x", r_x_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_y", r_y_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_z", r_z_near_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_near_LowSpeed_));
+    } else if (distance > 2 && speed < 0.5) {
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_far_HighSpeed_));
 
-  //     set_parameter(rclcpp::Parameter("ekf.r_x", r_x_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_y", r_y_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_z", r_z_far_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_far_HighSpeed_));
-  //   } else {
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_x", r_x_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_y", r_y_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_z", r_z_far_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_far_HighSpeed_));
+    } else {
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_x", s2qx_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_y", s2qy_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_z", s2qz_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_yaw", s2qyaw_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_r", s2qr_near_HighSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.sigma2_q_d_zc", s2qd_zc_near_HighSpeed_));
 
-  //     set_parameter(rclcpp::Parameter("ekf.r_x", r_x_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_y", r_y_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_z", r_z_far_LowSpeed_));
-  //     set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_far_LowSpeed_));
-  //   }
-  // }
+      set_parameter(rclcpp::Parameter("ekf.r_x", r_x_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_y", r_y_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_z", r_z_far_LowSpeed_));
+      set_parameter(rclcpp::Parameter("ekf.r_yaw", r_yaw_far_LowSpeed_));
+    }
+  }
 
   last_time_ = time;
 }
