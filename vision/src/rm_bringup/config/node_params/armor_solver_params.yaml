@@ -53,7 +53,7 @@
       r_yaw: 5e-4
 
     ekf_far_LowSpeed:
-      sigma2_q_x: 0.05
+      sigma2_q_x: 0.06
       sigma2_q_y: 0.05
       sigma2_q_z: 0.05
       sigma2_q_yaw: 2.0

@@ -72,7 +72,7 @@ rm_interfaces::msg::GimbalCmd Solver::solve(const rm_interfaces::msg::Target &ta
     controller_delay_ = node->get_parameter("solver.controller_delay").as_double();
     side_angle_ = node->get_parameter("solver.side_angle").as_double();
     min_switching_v_yaw_ = node->get_parameter("solver.min_switching_v_yaw").as_double();
-    if(bullet_speed_ == 0)
+    if(bullet_speed_ == 0 || bullet_speed_ < 5)
     {
       bullet_speed_ = 20;
     }

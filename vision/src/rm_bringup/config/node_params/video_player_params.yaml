@@ -5,4 +5,4 @@
     frame_rate: 10
     start_frame: 0
     frame_id: "camera_optical_frame"
-    keep_looping: true              #是否循环播放
+    keep_looping: false              #是否循环播放
