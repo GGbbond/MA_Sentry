@@ -74,7 +74,7 @@
     solver:
       prediction_delay: 0.0
       controller_delay: 0.0
-      max_tracking_v_yaw: 60.0 #转速(rad/s)大于这个值时瞄准机器人中心 
+      max_tracking_v_yaw: 6.5 #转速(rad/s)大于这个值时瞄准机器人中心 
       side_angle: 13.0 
       # bullet_speed: 21.0
       # bullet_speed: 10000.0
